@@ -1,0 +1,64 @@
+﻿
+<h3>@Name's TaskList</h3>
+
+@if(taskList.Count>0)
+{
+    <div class="progress my-2">
+        <div class="progress-bar" role="progressbar" 
+             style="width:@(percentDone)%"
+             aria-valuemin="0" aria-valuemax="100">@(percentDone)%
+           
+        </div>
+    </div>
+}
+
+<EditForm class="form-inline my-2" Model="@newTask" OnValidSubmit="AddTask">
+    <InputText class="form-control mx-2" @bind-Value="newTask.Task"/>
+    <button class="btn btn-outline-primary" type="submit">Add Task</button>
+</EditForm>
+
+<ul class="list-group">
+    @foreach (var task in taskList)
+    {
+        @if (task.IsComplete)//toggle taskcomplete
+        {
+            <li class="list-group-item list-group-item-secondary my-1"
+                @onclick="(() => task.IsComplete = !task.IsComplete)">
+                <del>@task.Task</del>
+            </li>
+        }
+        else
+        {
+            <li class="list-group-item list-group-item-success my-1"
+                @onclick="(() => task.IsComplete = !task.IsComplete)">
+                @task.Task
+            </li>
+        }
+
+     }
+
+</ul>
+
+@code {
+    private List<TaskModel> taskList = new List<TaskModel>();
+    private TaskModel newTask = new TaskModel();
+
+    [Parameter]
+    public string Name { get; set; }
+
+    private int percentDone
+    {
+        get
+        {
+            return (taskList.Count(x => x.IsComplete) * 100) / taskList.Count;
+        }
+    }
+
+    private void AddTask()
+    {
+        taskList.Add(newTask);
+        newTask = new TaskModel();
+
+        //Todo: hook to DB to store values or load values
+    }
+}
